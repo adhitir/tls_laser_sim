@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<robot name="lidar_sim" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <gazebo reference="base_link">
+    <gravity>0</gravity>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+    </plugin>
+    <plugin name="tc_sim_plugin" filename="libtc_sim_plugin.so">
+    </plugin>
+  </gazebo>
+
+</robot>
