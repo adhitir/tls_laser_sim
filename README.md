@@ -33,7 +33,7 @@ $ rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 
 **To Do:**
 
-- [ ] Adding `/odom` functionality to the 6DOF plugin for ground truth of Lidar pose
+- [x] Adding `/odom` functionality to the 6DOF plugin for ground truth of Lidar pose
 - [ ] Adding `/odom_cov` or `/imu` functionality to the plugin for realistic noisy measurements of Lidar pose
 - [ ] Adding rudimentary feature detection to extract sensor measurements that correspond to features (here, spheres)
 
