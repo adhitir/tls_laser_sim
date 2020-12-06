@@ -31,8 +31,8 @@ catkin_package(
 )
 
 
-add_executable(tf_broadcaster src/tf_broadcaster.cpp)
-target_link_libraries(tf_broadcaster ${catkin_LIBRARIES})
+#add_executable(tf_broadcaster src/tf_broadcaster.cpp)
+#target_link_libraries(tf_broadcaster ${catkin_LIBRARIES})
 
 add_library(tc_sim_plugin src/sim_plugin.cpp)
 target_link_libraries(tc_sim_plugin ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES})

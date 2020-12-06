@@ -27,6 +27,8 @@
     <param name="publish_frequency" type="double" value="30.0" />
   </node>
 
+  <!--node pkg="sim_description" type="tf_broadcaster" name="tf_broadcaster"/-->
+
 
 
 </launch>
