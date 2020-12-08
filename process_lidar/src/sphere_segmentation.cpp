@@ -21,6 +21,7 @@
 #include <vector>
 #include <Eigen/Geometry>
 #include <gazebo_msgs/LinkStates.h>
+#include <process_lidar/Sphere.h>
 
 
 typedef pcl::PointXYZ PointT;
@@ -33,7 +34,10 @@ class SubscribeProcessPublish {
             this->odom_subscriber = this->nh.subscribe<gazebo_msgs::LinkStates>("/gazebo/link_states", 5, &SubscribeProcessPublish::TruePositionCallBack, this);
             
             // assign publisher
-            this->publisher = this->nh.advertise<pcl::PCLPointCloud2> ("output", 1);
+            this->filter_publisher = this->nh.advertise<pcl::PCLPointCloud2> ("output", 1);
+            this->truepos_publisher = this->nh.advertise<process_lidar::Sphere> ("/truepos", 1);
+            this->measuredpos_publisher = this->nh.advertise<process_lidar::Sphere> ("/measuredpos", 1);
+
             //this->publisher = nh.advertise<vector<pcl_msgs::ModelCoefficients>> ("output", 1);
 
 
@@ -65,9 +69,10 @@ class SubscribeProcessPublish {
             Eigen::Vector3d t;
             Eigen::Matrix4d T; // Your Transformation Matrix
             Eigen::Matrix4d T_ls; // Tranformation from Lidar to sphere
+            
+            true_data_vec.clear();
 
-
-            for(size_t i=1; i<msg->name.size()-1; i++){
+            for(size_t i=2; i<msg->name.size(); i++){
                 const geometry_msgs::Pose sphere_pose = msg->pose[i];
                 q.w() = sphere_pose.orientation.w;
                 q.x() = sphere_pose.orientation.x;
@@ -88,9 +93,27 @@ class SubscribeProcessPublish {
 
                 // Since we are only interested in the distance value:
                 ROS_INFO("pose of sphere (laser frame) %i: x = %f, y = %f z = %f ", j, T_ls(0,3), T_ls(1,3), T_ls(2,3));
-                ROS_INFO("pose of sphere (ground truth) %i: x = %f, y = %f z = %f ", j, T(0,3), T(1,3), T(2,3));
+                //ROS_INFO("pose of sphere (ground truth) %i: x = %f, y = %f z = %f ", j, T(0,3), T(1,3), T(2,3));
+
+
+                this->true_data.label = "TruePos";
+                this->true_data.radius = 0.5;
+                this->true_data.index = j;
+
+
+                this->true_data.x = T_ls(0,3);
+                this->true_data.y = T_ls(1,3);
+                this->true_data.z = T_ls(2,3);
+
+
+                this->truepos_publisher.publish(this->true_data);
+
+                true_data_vec.push_back(true_data);
 
             }
+
+            //std::cout<<true_data_vec.size()<<std::endl;
+
 
 
         }
@@ -111,7 +134,7 @@ class SubscribeProcessPublish {
             pass.filter(*floorRemoved);
 
             // Publish the data for visualisation
-            this->publisher.publish (*floorRemoved);
+            this->filter_publisher.publish (*floorRemoved);
 
             // define a point cloud of type PointXYZ
             pcl::PointCloud<pcl::PointXYZ> pclXYZ;
@@ -187,10 +210,41 @@ class SubscribeProcessPublish {
                 pcl::PointCloud<PointT> cloud_sphere;
                 extract.filter (cloud_sphere);
                 pclXYZ_ptr->swap(cloud_sphere);
+                
 
+                //std::cout<<this->true_data_vec.size()<<std::endl;
+
+
+                this->mes_data.x = coefficients_sphere->values[0];
+                this->mes_data.y = coefficients_sphere->values[1];
+                this->mes_data.z = coefficients_sphere->values[2];
+
+                double diff;
+
+                for(size_t i=0; i<this->true_data_vec.size(); i++){
+                    diff = std::abs(this->true_data_vec[i].x - this->mes_data.x) + std::abs(this->true_data_vec[i].y - this->mes_data.y) + std::abs(this->true_data_vec[i].z - this->mes_data.z);
+                    if(diff < 0.1){
+                        n_spheres = i;
+                    }
+                    
+                    //std::cout << diff << " ";
+                }
+
+                //std::cout << std::endl; 
+
+
+                this->mes_data.label = "RANSAC";
+                this->mes_data.radius = coefficients_sphere->values[3];
+                this->mes_data.index = n_spheres;
+
+                
                 ROS_INFO("fitted sphere %i: x = %f, y = %f, z = %f radius = %f (inliers: %zu/%i)", n_spheres,
                  coefficients_sphere->values[0],coefficients_sphere->values[1],coefficients_sphere->values[2],coefficients_sphere->values[3],
                  inliers_sphere->indices.size(),original_size);
+                
+
+
+                this->measuredpos_publisher.publish(this->mes_data);
 
                 n_spheres++;              
                 
@@ -202,7 +256,14 @@ class SubscribeProcessPublish {
         ros::Subscriber vel_subscriber;
         ros::Subscriber odom_subscriber;
 
-        ros::Publisher publisher;
+        ros::Publisher filter_publisher;
+        ros::Publisher truepos_publisher;
+        ros::Publisher measuredpos_publisher;
+
+        process_lidar::Sphere true_data;
+        process_lidar::Sphere mes_data;
+        std::vector<process_lidar::Sphere> true_data_vec;
+
 
 };
 

@@ -8,8 +8,16 @@ find_package(catkin REQUIRED COMPONENTS
     pcl_ros
 )
 
-#find_package(PCL 1.4 REQUIRED)
+add_message_files(
+   FILES
+   Sphere.msg
+ )
 
+#find_package(PCL 1.4 REQUIRED)
+generate_messages(
+   DEPENDENCIES
+   std_msgs  # Or other packages containing msgs
+ )
 
 catkin_package()
 
@@ -21,7 +29,7 @@ catkin_package()
 
 
 include_directories(include ${catkin_INCLUDE_DIRS})
-add_executable(process_lidar src/cylinder_segmentation.cpp)
+add_executable(process_lidar src/sphere_segmentation.cpp)
 target_link_libraries(process_lidar ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
-
+#add_dependencies(sphere_segmentation ${catkin_EXPORTED_TARGETS})
