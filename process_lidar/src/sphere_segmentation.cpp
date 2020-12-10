@@ -41,6 +41,8 @@ class SubscribeProcessPublish {
             //this->publisher = nh.advertise<vector<pcl_msgs::ModelCoefficients>> ("output", 1);
 
 
+
+
         }
         void TruePositionCallBack(const gazebo_msgs::LinkStates::ConstPtr& msg){
             const geometry_msgs::Pose lidar_pose = msg->pose[1];
@@ -111,6 +113,8 @@ class SubscribeProcessPublish {
                 true_data_vec.push_back(true_data);
 
             }
+
+            ros::spinOnce();
 
             //std::cout<<true_data_vec.size()<<std::endl;
 
@@ -245,6 +249,7 @@ class SubscribeProcessPublish {
 
 
                 this->measuredpos_publisher.publish(this->mes_data);
+                
 
                 n_spheres++;              
                 

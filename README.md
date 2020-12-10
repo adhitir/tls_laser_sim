@@ -10,7 +10,7 @@ Version 1 of the simulation of a VLP-16 Lidar on a floating 6DOF frame observing
 - Gazebo
 - PCL
 
-**Note**: Tested on ROS Melodic
+**Note**: Tested on ROS Melodic and ROS Noetic
 
 **Installation:**
 
