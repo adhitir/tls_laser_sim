@@ -96,6 +96,8 @@ class SubscribeProcessPublish {
                 // Since we are only interested in the distance value:
                 ROS_INFO("pose of sphere (laser frame) %i: x = %f, y = %f z = %f ", j, T_ls(0,3), T_ls(1,3), T_ls(2,3));
                 //ROS_INFO("pose of sphere (ground truth) %i: x = %f, y = %f z = %f ", j, T(0,3), T(1,3), T(2,3));
+                
+                this->true_data.header.stamp = ros::Time::now ();
 
 
                 this->true_data.label = "TruePos";
@@ -235,7 +237,7 @@ class SubscribeProcessPublish {
                 }
 
                 //std::cout << std::endl; 
-
+                this->mes_data.header.stamp = ros::Time::now ();
 
                 this->mes_data.label = "RANSAC";
                 this->mes_data.radius = coefficients_sphere->values[3];
