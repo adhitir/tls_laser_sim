@@ -22,7 +22,6 @@
 #include <Eigen/Geometry>
 #include <gazebo_msgs/LinkStates.h>
 #include <process_lidar/Sphere.h>
-#include <process_lidar/Sphere_array.h>
 
 
 
@@ -37,8 +36,8 @@ class SubscribeProcessPublish {
             
             // assign publisher
             this->filter_publisher = this->nh.advertise<pcl::PCLPointCloud2> ("output", 1);
-            this->truepos_publisher = this->nh.advertise<process_lidar::Sphere_array> ("/truepos", 1);
-            this->measuredpos_publisher = this->nh.advertise<process_lidar::Sphere_array> ("/measuredpos", 1);
+            this->truepos_publisher = this->nh.advertise<process_lidar::Sphere> ("/truepos", 1);
+            this->measuredpos_publisher = this->nh.advertise<process_lidar::Sphere> ("/measuredpos", 1);
 
             //this->publisher = nh.advertise<vector<pcl_msgs::ModelCoefficients>> ("output", 1);
 
@@ -74,7 +73,7 @@ class SubscribeProcessPublish {
             Eigen::Matrix4d T; // Your Transformation Matrix
             Eigen::Matrix4d T_ls; // Tranformation from Lidar to sphere
             
-            this->true_data_vec.sphere_vec.clear();
+            true_data_vec.clear();
 
             for(size_t i=2; i<msg->name.size(); i++){
                 const geometry_msgs::Pose sphere_pose = msg->pose[i];
@@ -99,7 +98,7 @@ class SubscribeProcessPublish {
                 ROS_INFO("pose of sphere (laser frame) %i: x = %f, y = %f z = %f ", j, T_ls(0,3), T_ls(1,3), T_ls(2,3));
                 //ROS_INFO("pose of sphere (ground truth) %i: x = %f, y = %f z = %f ", j, T(0,3), T(1,3), T(2,3));
                 
-                //this->true_data.header.stamp = ros::Time::now ();
+                this->true_data.header.stamp = ros::Time::now ();
 
 
                 this->true_data.label = "TruePos";
@@ -111,15 +110,14 @@ class SubscribeProcessPublish {
                 this->true_data.y = T_ls(1,3);
                 this->true_data.z = T_ls(2,3);
 
-                this->true_data_vec.sphere_vec.push_back(true_data);
+
+                this->truepos_publisher.publish(this->true_data);
+
+                true_data_vec.push_back(true_data);
 
             }
 
             ros::spinOnce();
-
-            this->true_data_vec.header.stamp = ros::Time::now ();
-            this->truepos_publisher.publish(this->true_data_vec);
-
 
             //std::cout<<true_data_vec.size()<<std::endl;
 
@@ -193,8 +191,6 @@ class SubscribeProcessPublish {
             //vector<pcl_msgs::ModelCoefficients> all_spheres;
             std::vector<pcl::ModelCoefficients> all_spheres;
 
-            mes_data_vec.sphere_vec.clear();
-
             while(pclXYZ_ptr->height*pclXYZ_ptr->width > original_size*0.05){
 
                 // Estimate point normals
@@ -232,8 +228,8 @@ class SubscribeProcessPublish {
 
                 double diff;
 
-                for(size_t i=0; i<this->true_data_vec.sphere_vec.size(); i++){
-                    diff = std::abs(this->true_data_vec.sphere_vec[i].x - this->mes_data.x) + std::abs(this->true_data_vec.sphere_vec[i].y - this->mes_data.y) + std::abs(this->true_data_vec.sphere_vec[i].z - this->mes_data.z);
+                for(size_t i=0; i<this->true_data_vec.size(); i++){
+                    diff = std::abs(this->true_data_vec[i].x - this->mes_data.x) + std::abs(this->true_data_vec[i].y - this->mes_data.y) + std::abs(this->true_data_vec[i].z - this->mes_data.z);
                     if(diff < 0.1){
                         n_spheres = i;
                     }
@@ -242,7 +238,7 @@ class SubscribeProcessPublish {
                 }
 
                 //std::cout << std::endl; 
-                //this->mes_data.header.stamp = ros::Time::now ();
+                this->mes_data.header.stamp = ros::Time::now ();
 
                 this->mes_data.label = "RANSAC";
                 this->mes_data.radius = coefficients_sphere->values[3];
@@ -255,17 +251,12 @@ class SubscribeProcessPublish {
                 
 
 
-                //this->measuredpos_publisher.publish(this->mes_data);
-
-                this->mes_data_vec.sphere_vec.push_back(mes_data);
+                this->measuredpos_publisher.publish(this->mes_data);
                 
 
                 n_spheres++;              
                 
             }
-
-            this->mes_data_vec.header.stamp = ros::Time::now ();
-            this->measuredpos_publisher.publish(this->mes_data_vec);
         }
 
     private:
@@ -279,8 +270,7 @@ class SubscribeProcessPublish {
 
         process_lidar::Sphere true_data;
         process_lidar::Sphere mes_data;
-        process_lidar::Sphere_array true_data_vec;
-        process_lidar::Sphere_array mes_data_vec;
+        std::vector<process_lidar::Sphere> true_data_vec;
 
 
 };

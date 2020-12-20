@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <process_lidar/Sphere.h>
+#include <process_lidar/Sphere_array.h>
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include <message_filters/subscriber.h>
@@ -10,7 +11,7 @@ ros::Publisher data1_pub;
 ros::Publisher data2_pub;
 
 
-void callback(const process_lidar::Sphere::ConstPtr& data1, const process_lidar::Sphere::ConstPtr& data2)
+void callback(const process_lidar::Sphere_array::ConstPtr& data1, const process_lidar::Sphere_array::ConstPtr& data2)
 {
 
   ROS_INFO("Sync_Callback");
@@ -28,13 +29,16 @@ int main(int argc, char** argv)
 
 
     ros::NodeHandle nh;
-    message_filters::Subscriber<process_lidar::Sphere> data1_sub(nh, data1_topic, 100);
-    message_filters::Subscriber<process_lidar::Sphere> data2_sub(nh, data2_topic, 100);
+    message_filters::Subscriber<process_lidar::Sphere_array> data1_sub(nh, data1_topic, 100);
+    message_filters::Subscriber<process_lidar::Sphere_array> data2_sub(nh, data2_topic, 100);
 
-    data1_pub = nh.advertise<process_lidar::Sphere>("/synchronized" + data1_topic, 100);
-    data2_pub = nh.advertise<process_lidar::Sphere>("/synchronized" + data2_topic, 100);
+    data1_pub = nh.advertise<process_lidar::Sphere_array>("/synchronized" + data1_topic, 100);
+    data2_pub = nh.advertise<process_lidar::Sphere_array>("/synchronized" + data2_topic, 100);
 
-    typedef sync_policies::ApproximateTime<process_lidar::Sphere, process_lidar::Sphere> MySyncPolicy;
+    typedef sync_policies::ApproximateTime<process_lidar::Sphere_array, process_lidar::Sphere_array> MySyncPolicy;
+
+    //ROS_INFO("Sync_Callback");
+
 
     Synchronizer<MySyncPolicy> sync(MySyncPolicy(10), data1_sub, data2_sub);
 

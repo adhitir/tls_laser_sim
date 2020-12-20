@@ -16,6 +16,8 @@ find_package(Boost REQUIRED COMPONENTS system)
 add_message_files(
    FILES
    Sphere.msg
+   Sphere_array.msg
+
  )
 
 #find_package(PCL 1.4 REQUIRED)
