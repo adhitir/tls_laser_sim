@@ -7,6 +7,7 @@
   <arg name="debug" default="false"/>
   <arg name="verbose" default="false"/>
   <arg name="world_name" default="three_body"/>
+  <arg name="z" default="0.5"/>
 
   <!-- Start gazebo and load the world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch" >
@@ -22,7 +23,7 @@
 
   <arg name="gpu" default="false"/>
   <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find sim_description)/urdf/sim.urdf.xacro' gpu:=$(arg gpu)" />
-  <node pkg="gazebo_ros" type="spawn_model" name="spawn_model" args="-urdf -param /robot_description -model lidar_sim"/>
+  <node pkg="gazebo_ros" type="spawn_model" name="spawn_model" args="-urdf -param /robot_description -model lidar_sim -z $(arg z)"/>
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
     <param name="publish_frequency" type="double" value="30.0" />
   </node>
