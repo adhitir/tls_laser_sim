@@ -21,13 +21,47 @@ simulation of a VLP-16 Lidar on a floating 6DOF frame observing measurements of 
 
 **Installation:**
 
-Check if you have PCL with:
+1. Check if you have PCL with:
 
-```
-ldconfig -p | grep libpcl
-```
+   ```bash
+   $ ldconfig -p | grep libpcl
+   ```
 
-Otherwise install from https://pointclouds.org/downloads/
+   Otherwise install from https://pointclouds.org/downloads/
+
+   If you have ROS Kinetic and above installed on your system, then you will have the required PCL libraries by default. 
+
+2. Create a new folder in your home environment called `ros_ws`. Create a folder within in called `src`. 
+
+   ```bash
+   $ mkdir ros_ws & cd ros_ws
+   ros_ws$ mkdir src & cd src
+   ```
+
+3. Clone the `velodyne_simulator` [package](https://github.com/ToyotaResearchInstitute/velodyne_simulator.git)  in the `src` folder. Clone the dev branch corresponding to your ROS version. For Kinetic, the "master" branch will need to be cloned.
+
+   ```bash
+   $ git clone https://github.com/ToyotaResearchInstitute/velodyne_simulator.git --branch master --single-branch
+   ```
+
+ 4. Clone this package into the `src` folder. 
+
+    ```bash
+    $ git clone https://github.com/adhitir/tls_laser_sim 
+    ```
+
+	5. Return to the `ros_ws` folder and build and source it.
+
+    ```bash
+    ros_ws$ catkin_make
+    ros_ws$ source devel/setup.bash
+    ```
+
+    Add the sourcing to the ~/.bashrc file.
+
+    ```bash
+    $ echo 'source ~/home/<username>/ros_ws/devel/setup.bash' >> ~/.bashrc 
+    ```
 
 **Implementation:**
 
