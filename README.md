@@ -11,17 +11,6 @@ simulation of a VLP-16 Lidar on a floating 6DOF frame observing measurements of 
 
 <img src="./images/laser_v1.gif" style="zoom: 67%;" />
 
-**For Cpp Nanodegree, Rubric points addressed:**
-
-* A variety of control structures are used in the project.The project code is clearly organized into functions.
-* The project reads data from an external file or writes data to a file as part of the necessary operation of the program. Not sure if it counts as "external", but the code does read point cloud data from the lidar while it processes and segments it.
-* The project accepts input from a user as part of the necessary operation of the program. The lidar motion can be controlled through the teleop_twist_keyboard node. This node is written in python, however.
-* The project code is organized into classes with class attributes to hold the data, and class methods to perform tasks.
-* All class data members are explicitly specified as public, protected, or private.
-* At least two variables are defined as references, or two functions use pass-by-reference in the project code.
-* All class member functions document their effects, either through function names, comments, or formal documentation. Member functions do not change program state in undocumented ways. 
-
-
 
 
 **Dependencies:**
